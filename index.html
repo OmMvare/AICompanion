@@ -1,0 +1,574 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Adaptive Study Companion</title>
+    <meta name="description" content="AI-powered study companion with PDF upload, Q&A, and quiz generation.">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['Inter', 'system-ui', 'sans-serif'] },
+                }
+            }
+        }
+    </script>
+    <style>
+        body { font-family: 'Inter', system-ui, sans-serif; }
+        .glass { background: rgba(255,255,255,0.05); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); border: 1px solid rgba(255,255,255,0.08); }
+        .gradient-btn { background: linear-gradient(135deg, #6366f1, #8b5cf6, #a855f7); }
+        .gradient-btn:hover { background: linear-gradient(135deg, #818cf8, #a78bfa, #c084fc); transform: scale(1.03); }
+        .gradient-btn:disabled { opacity: 0.6; transform: none; cursor: not-allowed; }
+        .glow { box-shadow: 0 0 30px rgba(99,102,241,0.15); }
+        .spinner { width: 20px; height: 20px; border: 2.5px solid rgba(255,255,255,0.3); border-top-color: #fff; border-radius: 50%; animation: spin 0.7s linear infinite; display: inline-block; vertical-align: middle; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+        .fade-in { animation: fadeIn 0.4s ease-out; }
+        .drop-zone.dragover { border-color: #818cf8; background: rgba(99,102,241,0.1); }
+        ::-webkit-scrollbar { width: 6px; } ::-webkit-scrollbar-track { background: transparent; } ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.15); border-radius: 3px; }
+        
+        /* Landing Page Animations */
+        html { scroll-behavior: smooth; }
+        .fade-in-up { animation: fadeInUp 0.8s ease-out forwards; opacity: 0; transform: translateY(20px); }
+        @keyframes fadeInUp { to { opacity: 1; transform: translateY(0); } }
+        .delay-100 { animation-delay: 100ms; }
+        .delay-200 { animation-delay: 200ms; }
+        .delay-300 { animation-delay: 300ms; }
+    </style>
+</head>
+<body class="bg-gray-950 min-h-screen text-gray-200">
+
+    <!-- LANDING PAGE SECTION -->
+    <div id="landingSection" class="min-h-screen flex flex-col">
+        <!-- Landing Navbar -->
+        <nav class="glass border-b border-white/5 w-full fixed top-0 z-50">
+            <div class="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
+                <div class="flex items-center gap-3">
+                    <div class="w-9 h-9 rounded-xl gradient-btn flex items-center justify-center text-white font-bold text-sm">AS</div>
+                    <span class="text-xl font-bold text-white tracking-tight">Adaptive Study Companion</span>
+                </div>
+            </div>
+        </nav>
+
+        <!-- Hero Section -->
+        <main class="flex-grow flex flex-col justify-center items-center text-center px-6 pt-32 pb-20 relative overflow-hidden">
+            <!-- Background Decoration -->
+            <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] md:w-[800px] md:h-[800px] bg-indigo-500/20 blur-[120px] rounded-full pointer-events-none"></div>
+            
+            <h1 class="text-5xl md:text-7xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 via-purple-400 to-pink-400 mb-6 fade-in-up">
+                Adaptive Study Companion
+            </h1>
+            <p class="text-lg md:text-2xl text-gray-400 mb-10 max-w-2xl fade-in-up delay-100">
+                Your AI-powered personalized learning assistant. Upload PDFs, generate quizzes, and track your progress instantly.
+            </p>
+            <button id="startStudyingBtn" class="gradient-btn text-white font-semibold text-lg px-8 py-4 rounded-full shadow-lg shadow-indigo-500/30 transition-all duration-300 hover:-translate-y-1 hover:shadow-indigo-500/50 fade-in-up delay-200 flex items-center gap-2">
+                Start Studying
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"/></svg>
+            </button>
+
+            <!-- Scroll Indicator -->
+            <a href="#features" class="absolute bottom-10 animate-bounce text-gray-500 hover:text-white transition-colors fade-in-up delay-300">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"/></svg>
+            </a>
+        </main>
+
+        <!-- Features Section -->
+        <section id="features" class="py-24 px-6 relative z-10">
+            <div class="max-w-7xl mx-auto">
+                <h2 class="text-3xl font-bold text-center mb-16 text-white">Supercharge Your Learning</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                    <!-- Feature Cards -->
+                    <div class="glass p-8 rounded-2xl hover:-translate-y-2 transition-transform duration-300 glow">
+                        <div class="w-12 h-12 rounded-xl bg-purple-500/20 text-purple-400 flex items-center justify-center mb-6">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                        </div>
+                        <h3 class="text-xl font-bold text-white mb-3">AI Q&A</h3>
+                        <p class="text-gray-400 text-sm">Upload any PDF and ask complex questions. Get instant, accurate answers based purely on your material.</p>
+                    </div>
+                    <div class="glass p-8 rounded-2xl hover:-translate-y-2 transition-transform duration-300 glow">
+                        <div class="w-12 h-12 rounded-xl bg-amber-500/20 text-amber-400 flex items-center justify-center mb-6">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/></svg>
+                        </div>
+                        <h3 class="text-xl font-bold text-white mb-3">Quiz Generator</h3>
+                        <p class="text-gray-400 text-sm">Automatically generate multiple-choice questions to test your knowledge and reinforce retention.</p>
+                    </div>
+                    <div class="glass p-8 rounded-2xl hover:-translate-y-2 transition-transform duration-300 glow">
+                        <div class="w-12 h-12 rounded-xl bg-blue-500/20 text-blue-400 flex items-center justify-center mb-6">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                        </div>
+                        <h3 class="text-xl font-bold text-white mb-3">Pomodoro Timer</h3>
+                        <p class="text-gray-400 text-sm">Stay focused with our built-in Pomodoro timer and track your daily study time seamlessly.</p>
+                    </div>
+                    <div class="glass p-8 rounded-2xl hover:-translate-y-2 transition-transform duration-300 glow">
+                        <div class="w-12 h-12 rounded-xl bg-pink-500/20 text-pink-400 flex items-center justify-center mb-6">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
+                        </div>
+                        <h3 class="text-xl font-bold text-white mb-3">Quick Notes</h3>
+                        <p class="text-gray-400 text-sm">Jot down important points while you study. Notes are automatically saved to your browser.</p>
+                    </div>
+                    <div class="glass p-8 rounded-2xl hover:-translate-y-2 transition-transform duration-300 glow">
+                        <div class="w-12 h-12 rounded-xl bg-orange-500/20 text-orange-400 flex items-center justify-center mb-6">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+                        </div>
+                        <h3 class="text-xl font-bold text-white mb-3">Daily Streaks</h3>
+                        <p class="text-gray-400 text-sm">Build a habit by tracking your daily study streak and maintaining your momentum.</p>
+                    </div>
+                    <div class="glass p-8 rounded-2xl hover:-translate-y-2 transition-transform duration-300 glow">
+                        <div class="w-12 h-12 rounded-xl bg-emerald-500/20 text-emerald-400 flex items-center justify-center mb-6">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                        </div>
+                        <h3 class="text-xl font-bold text-white mb-3">Exam Planner</h3>
+                        <p class="text-gray-400 text-sm">Track your generated quizzes and asked questions to monitor your overall progress.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Footer -->
+        <footer class="border-t border-white/5 py-8 text-center text-gray-500 text-sm mt-auto">
+            &copy; 2026 Adaptive Study Companion. All rights reserved.
+        </footer>
+    </div>
+
+    <!-- MAIN APP SECTION -->
+    <div id="appSection" class="hidden fade-in">
+        <!-- Navbar -->
+    <nav class="sticky top-0 z-50 glass border-b border-white/5">
+        <div class="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <div class="w-9 h-9 rounded-xl gradient-btn flex items-center justify-center text-white font-bold text-sm">AS</div>
+                <h1 class="text-xl font-bold text-white tracking-tight">Adaptive Study Companion</h1>
+            </div>
+            <div class="flex items-center gap-4">
+                <span id="smartGreeting" class="text-sm font-medium text-gray-400 hidden md:block"></span>
+                <button id="focusToggleBtn" class="text-xs px-4 py-2 rounded-lg border border-white/10 hover:bg-white/10 transition-colors flex items-center gap-2 text-gray-300">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /></svg>
+                    <span>Focus Mode</span>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="max-w-7xl mx-auto px-6 py-8">
+        
+        <!-- Dashboard Section -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6" id="dashboardSection">
+            <!-- Streak -->
+            <div class="glass rounded-xl p-4 flex items-center gap-4 glow">
+                <div class="w-12 h-12 rounded-lg bg-orange-500/10 flex items-center justify-center text-orange-500 text-2xl">🔥</div>
+                <div>
+                    <p class="text-xs text-gray-400 uppercase tracking-wider font-semibold">Daily Streak</p>
+                    <p id="streakCount" class="text-xl font-bold text-white mt-0.5">0 Days</p>
+                </div>
+            </div>
+            <!-- Study Time -->
+            <div class="glass rounded-xl p-4 flex items-center justify-between glow">
+                <div class="flex items-center gap-4">
+                    <div class="w-12 h-12 rounded-lg bg-blue-500/10 flex items-center justify-center text-blue-500 text-2xl">⏱️</div>
+                    <div>
+                        <p class="text-xs text-gray-400 uppercase tracking-wider font-semibold">Study Time</p>
+                        <p id="studyTimeCount" class="text-xl font-bold text-white mt-0.5">0 mins</p>
+                    </div>
+                </div>
+                <button id="pomodoroToggle" class="text-xs bg-white/10 hover:bg-white/20 text-white px-4 py-2 rounded-lg transition-all font-medium border border-white/5">Start</button>
+            </div>
+            <!-- Progress -->
+            <div class="glass rounded-xl p-4 flex items-center gap-4 glow">
+                <div class="w-12 h-12 rounded-lg bg-emerald-500/10 flex items-center justify-center text-emerald-500 text-2xl">📊</div>
+                <div>
+                    <p class="text-xs text-gray-400 uppercase tracking-wider font-semibold">Progress</p>
+                    <p class="text-sm font-medium text-white mt-1"><span id="questionsCount" class="text-emerald-400 font-bold">0</span> Qs &bull; <span id="quizzesCount" class="text-emerald-400 font-bold">0</span> Quizzes</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-5 gap-6">
+
+            <!-- LEFT PANEL -->
+            <div class="lg:col-span-2 space-y-6">
+
+                <!-- Upload Card -->
+                <div class="glass rounded-2xl p-6 glow">
+                    <h2 class="text-base font-semibold text-white mb-4 flex items-center gap-2">
+                        <svg class="w-5 h-5 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/></svg>
+                        Upload Document
+                    </h2>
+                    <form id="uploadForm">
+                        <div id="dropZone" class="drop-zone border-2 border-dashed border-gray-700 rounded-xl p-8 text-center cursor-pointer transition-all duration-300 hover:border-indigo-500/50">
+                            <svg class="w-10 h-10 text-gray-600 mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 13h6m-3-3v6m5 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                            <p class="text-sm text-gray-400 mb-1">Drag & drop your PDF here</p>
+                            <p class="text-xs text-gray-600">or click to browse</p>
+                            <input type="file" id="fileInput" accept=".pdf" class="hidden" required>
+                        </div>
+                        <div id="fileInfo" class="hidden mt-3 flex items-center justify-between bg-white/5 rounded-lg px-4 py-2">
+                            <span id="fileName" class="text-sm text-gray-300 truncate"></span>
+                            <button type="button" id="clearFile" class="text-gray-500 hover:text-red-400 text-lg leading-none">&times;</button>
+                        </div>
+                        <button type="submit" id="uploadBtn" class="w-full mt-4 gradient-btn text-white font-medium py-2.5 rounded-xl transition-all duration-200 text-sm">Upload File</button>
+                    </form>
+                    <div id="uploadResult" class="hidden mt-3 text-sm font-medium rounded-lg px-4 py-2.5"></div>
+                </div>
+
+                <!-- Ask Card -->
+                <div class="glass rounded-2xl p-6 glow">
+                    <h2 class="text-base font-semibold text-white mb-4 flex items-center gap-2">
+                        <svg class="w-5 h-5 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                        Ask a Question
+                    </h2>
+                    <form id="askForm">
+                        <textarea id="questionInput" rows="4" class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm text-gray-200 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-transparent resize-none transition-all" placeholder="Ask anything about your document or a topic..." required></textarea>
+                        <button type="submit" id="askBtn" class="w-full mt-3 gradient-btn text-white font-medium py-2.5 rounded-xl transition-all duration-200 text-sm flex items-center justify-center gap-2">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+                            Ask AI
+                        </button>
+                    </form>
+                </div>
+
+                <!-- Quiz Trigger Card -->
+                <div class="glass rounded-2xl p-6 glow">
+                    <h2 class="text-base font-semibold text-white mb-4 flex items-center gap-2">
+                        <svg class="w-5 h-5 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/></svg>
+                        Generate Quiz
+                    </h2>
+                    <div class="mb-4">
+                        <label class="text-xs text-gray-400 uppercase tracking-wider font-semibold mb-2 block">Number of Questions</label>
+                        <select id="quizCount" class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-sm text-gray-200 focus:outline-none focus:ring-2 focus:ring-amber-500/50">
+                            <option value="5">5 Questions</option>
+                            <option value="10">10 Questions</option>
+                            <option value="15">15 Questions</option>
+                        </select>
+                    </div>
+                    <button id="quizBtn" class="w-full gradient-btn text-white font-medium py-2.5 rounded-xl transition-all duration-200 text-sm flex items-center justify-center gap-2">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+                        Generate Quiz
+                    </button>
+                </div>
+
+                <!-- Quick Notes Card -->
+                <div id="notesCard" class="glass rounded-2xl p-6 glow">
+                    <h2 class="text-base font-semibold text-white mb-4 flex items-center gap-2">
+                        <svg class="w-5 h-5 text-pink-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
+                        Quick Notes
+                    </h2>
+                    <textarea id="quickNotes" rows="4" class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm text-gray-200 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-pink-500/50 resize-none transition-all" placeholder="Jot down important points..."></textarea>
+                    <button id="saveNotesBtn" class="w-full mt-3 bg-white/10 hover:bg-white/20 text-white font-medium py-2.5 rounded-xl transition-all duration-200 text-sm flex items-center justify-center gap-2 border border-white/5">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"/></svg>
+                        Save Notes
+                    </button>
+                </div>
+            </div>
+
+            <!-- RIGHT PANEL -->
+            <div class="lg:col-span-3 space-y-6">
+
+                <!-- Answer Output -->
+                <div id="answerContainer" class="glass rounded-2xl p-6 glow hidden fade-in">
+                    <h2 class="text-base font-semibold text-white mb-4 flex items-center gap-2">
+                        <svg class="w-5 h-5 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/></svg>
+                        AI Answer
+                    </h2>
+                    <div id="answerText" class="text-sm text-gray-300 leading-relaxed whitespace-pre-wrap max-h-96 overflow-y-auto bg-white/5 rounded-xl p-4"></div>
+                </div>
+
+                <!-- Quiz Output -->
+                <div id="quizContainer" class="hidden space-y-4 fade-in">
+                    <!-- Quiz items injected here -->
+                </div>
+
+                <!-- Empty state -->
+                <div id="emptyState" class="glass rounded-2xl p-12 glow text-center">
+                    <svg class="w-16 h-16 text-gray-700 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/></svg>
+                    <h3 class="text-lg font-semibold text-gray-500 mb-2">No results yet</h3>
+                    <p class="text-sm text-gray-600">Upload a document, ask a question, or generate a quiz to get started.</p>
+                </div>
+            </div>
+        </div>
+    </main>
+    </div>
+
+    <!-- ERP Shortcut Button -->
+    <a href="https://learner.zealerp.in/" target="_blank" class="fixed bottom-6 right-6 z-50 glass px-4 py-2.5 rounded-xl flex items-center gap-2 border border-white/10 hover:border-indigo-500/50 transition-all duration-300 shadow-2xl group glow">
+        <div class="w-2 h-2 rounded-full bg-indigo-500 group-hover:animate-pulse"></div>
+        <span class="text-xs font-bold text-gray-200 uppercase tracking-widest">ERP</span>
+        <svg class="w-3 h-3 text-gray-500 group-hover:text-white transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
+    </a>
+
+    <script>
+        // --- Landing Page Logic ---
+        document.getElementById('startStudyingBtn').addEventListener('click', () => {
+            document.getElementById('landingSection').classList.add('hidden');
+            document.getElementById('appSection').classList.remove('hidden');
+            window.scrollTo(0, 0);
+        });
+
+        // --- Smart Features (LocalStorage & Logic) ---
+        const getStorage = (key, def) => JSON.parse(localStorage.getItem(key)) || def;
+        const setStorage = (key, val) => localStorage.setItem(key, JSON.stringify(val));
+
+        // 1. Smart Greeting
+        function updateGreeting() {
+            const hour = new Date().getHours();
+            let greeting = "Good Evening";
+            if (hour < 12) greeting = "Good Morning";
+            else if (hour < 18) greeting = "Good Afternoon";
+            document.getElementById('smartGreeting').textContent = `${greeting} 👋 Ready to study?`;
+        }
+
+        // 2. Daily Streak
+        function updateStreak() {
+            const today = new Date().toDateString();
+            let streakData = getStorage('streakData', { lastDate: null, streak: 0 });
+            
+            if (streakData.lastDate !== today) {
+                const yesterday = new Date();
+                yesterday.setDate(yesterday.getDate() - 1);
+                
+                if (streakData.lastDate === yesterday.toDateString()) {
+                    streakData.streak += 1;
+                } else if (streakData.lastDate !== null) {
+                    streakData.streak = 1; // Reset if missed a day, unless first time
+                } else {
+                    streakData.streak = 1; // First time
+                }
+                streakData.lastDate = today;
+                setStorage('streakData', streakData);
+            }
+            document.getElementById('streakCount').textContent = `${streakData.streak} Day${streakData.streak !== 1 ? 's' : ''}`;
+        }
+
+        // 3. Progress Tracker
+        function updateProgress(type) {
+            let progress = getStorage('studyProgress', { questions: 0, quizzes: 0 });
+            if (type === 'question') progress.questions += 1;
+            if (type === 'quiz') progress.quizzes += 1;
+            setStorage('studyProgress', progress);
+            renderProgress();
+        }
+        function renderProgress() {
+            const progress = getStorage('studyProgress', { questions: 0, quizzes: 0 });
+            document.getElementById('questionsCount').textContent = progress.questions;
+            document.getElementById('quizzesCount').textContent = progress.quizzes;
+        }
+
+        // 4. Quick Notes
+        const notesInput = document.getElementById('quickNotes');
+        function loadNotes() {
+            notesInput.value = getStorage('quickNotes', '');
+        }
+        document.getElementById('saveNotesBtn').addEventListener('click', () => {
+            setStorage('quickNotes', notesInput.value);
+            const btn = document.getElementById('saveNotesBtn');
+            const originalHTML = btn.innerHTML;
+            btn.innerHTML = '✓ Saved!';
+            btn.classList.replace('bg-white/10', 'bg-emerald-500/20');
+            btn.classList.replace('hover:bg-white/20', 'bg-emerald-500/30');
+            btn.classList.replace('text-white', 'text-emerald-400');
+            setTimeout(() => {
+                btn.innerHTML = originalHTML;
+                btn.classList.replace('bg-emerald-500/20', 'bg-white/10');
+                btn.classList.replace('bg-emerald-500/30', 'hover:bg-white/20');
+                btn.classList.replace('text-emerald-400', 'text-white');
+            }, 2000);
+        });
+
+        // 5. Pomodoro / Study Time Tracker
+        let pomoInterval;
+        let pomoTime = 0;
+        let isPomoRunning = false;
+        function trackStudyTime() {
+            const btn = document.getElementById('pomodoroToggle');
+            if (isPomoRunning) {
+                clearInterval(pomoInterval);
+                btn.textContent = 'Start';
+                btn.classList.replace('bg-red-500/20', 'bg-white/10');
+                btn.classList.replace('hover:bg-red-500/30', 'hover:bg-white/20');
+                btn.classList.replace('text-red-400', 'text-white');
+            } else {
+                btn.textContent = 'Pause';
+                btn.classList.replace('bg-white/10', 'bg-red-500/20');
+                btn.classList.replace('hover:bg-white/20', 'hover:bg-red-500/30');
+                btn.classList.replace('text-white', 'text-red-400');
+                pomoInterval = setInterval(() => {
+                    pomoTime++;
+                    if (pomoTime % 60 === 0) { // Every 60 seconds = 1 minute
+                        let totalMins = getStorage('studyMins', 0) + 1;
+                        setStorage('studyMins', totalMins);
+                        renderStudyTime();
+                    }
+                }, 1000);
+            }
+            isPomoRunning = !isPomoRunning;
+        }
+        function renderStudyTime() {
+            document.getElementById('studyTimeCount').textContent = `${getStorage('studyMins', 0)} mins`;
+        }
+        document.getElementById('pomodoroToggle').addEventListener('click', trackStudyTime);
+
+        // 6. Focus Mode
+        let focusMode = false;
+        function toggleFocusMode() {
+            focusMode = !focusMode;
+            const btn = document.getElementById('focusToggleBtn');
+            const btnText = btn.querySelector('span');
+            const uploadCard = document.getElementById('uploadForm').parentElement;
+            const quizCard = document.getElementById('quizBtn').parentElement;
+            const notesCard = document.getElementById('notesCard');
+            const dashboard = document.getElementById('dashboardSection');
+            
+            if (focusMode) {
+                btnText.textContent = 'Exit Focus';
+                btn.classList.add('bg-indigo-500/20', 'text-indigo-400', 'border-indigo-500/50');
+                btn.classList.remove('text-gray-300');
+                uploadCard.classList.add('hidden');
+                quizCard.classList.add('hidden');
+                notesCard.classList.add('hidden');
+                // dashboard.classList.add('hidden'); // Optional: hide dashboard too? No, keep pomodoro visible.
+            } else {
+                btnText.textContent = 'Focus Mode';
+                btn.classList.remove('bg-indigo-500/20', 'text-indigo-400', 'border-indigo-500/50');
+                btn.classList.add('text-gray-300');
+                uploadCard.classList.remove('hidden');
+                quizCard.classList.remove('hidden');
+                notesCard.classList.remove('hidden');
+            }
+        }
+        document.getElementById('focusToggleBtn').addEventListener('click', toggleFocusMode);
+
+        // Initialize features
+        updateGreeting();
+        updateStreak();
+        renderProgress();
+        renderStudyTime();
+        loadNotes();
+
+        // --- Drag & Drop ---
+        const dropZone = document.getElementById('dropZone');
+        const fileInput = document.getElementById('fileInput');
+        const fileInfo = document.getElementById('fileInfo');
+        const fileName = document.getElementById('fileName');
+
+        dropZone.addEventListener('click', () => fileInput.click());
+        dropZone.addEventListener('dragover', e => { e.preventDefault(); dropZone.classList.add('dragover'); });
+        dropZone.addEventListener('dragleave', () => dropZone.classList.remove('dragover'));
+        dropZone.addEventListener('drop', e => {
+            e.preventDefault(); dropZone.classList.remove('dragover');
+            if (e.dataTransfer.files.length) { fileInput.files = e.dataTransfer.files; showFileInfo(); }
+        });
+        fileInput.addEventListener('change', showFileInfo);
+        document.getElementById('clearFile').addEventListener('click', () => {
+            fileInput.value = ''; fileInfo.classList.add('hidden');
+        });
+        function showFileInfo() {
+            if (fileInput.files[0]) { fileName.textContent = fileInput.files[0].name; fileInfo.classList.remove('hidden'); }
+        }
+
+        // --- Helpers ---
+        function hideEmptyState() { document.getElementById('emptyState').classList.add('hidden'); }
+        function showError(container, msg) {
+            container.innerHTML = `<div class="bg-red-500/10 border border-red-500/20 rounded-xl px-4 py-3 text-sm text-red-400 fade-in">❌ ${msg}</div>`;
+        }
+        function setLoading(btn, loading, label) {
+            btn.disabled = loading;
+            btn.innerHTML = loading ? `<span class="spinner"></span> Processing...` : label;
+        }
+
+        // 1. File Upload
+        document.getElementById('uploadForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            if (!fileInput.files[0]) return;
+            const formData = new FormData();
+            formData.append('file', fileInput.files[0]);
+            const resultEl = document.getElementById('uploadResult');
+            const uploadBtn = document.getElementById('uploadBtn');
+            setLoading(uploadBtn, true, 'Upload File');
+            resultEl.className = 'mt-3 text-sm font-medium rounded-lg px-4 py-2.5 block bg-indigo-500/10 text-indigo-300';
+            resultEl.textContent = 'Uploading...';
+            try {
+                const res = await fetch('/upload', { method: 'POST', body: formData });
+                const data = await res.json();
+                if (res.ok) {
+                    resultEl.textContent = '✅ ' + data.message;
+                    resultEl.className = 'mt-3 text-sm font-medium rounded-lg px-4 py-2.5 block bg-emerald-500/10 text-emerald-400 fade-in';
+                } else { throw new Error(data.detail || 'Upload failed'); }
+            } catch (err) {
+                resultEl.textContent = '❌ ' + err.message;
+                resultEl.className = 'mt-3 text-sm font-medium rounded-lg px-4 py-2.5 block bg-red-500/10 text-red-400 fade-in';
+            } finally { setLoading(uploadBtn, false, 'Upload File'); }
+        });
+
+        // 2. Ask Question
+        document.getElementById('askForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const question = document.getElementById('questionInput').value;
+            const container = document.getElementById('answerContainer');
+            const answerText = document.getElementById('answerText');
+            const askBtn = document.getElementById('askBtn');
+            hideEmptyState();
+            container.classList.remove('hidden');
+            answerText.innerHTML = '<span class="spinner"></span> <span class="text-gray-400 ml-2">Thinking...</span>';
+            setLoading(askBtn, true, '<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg> Ask AI');
+            try {
+                const res = await fetch('/ask', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ question }) });
+                const data = await res.json();
+                if (data.error) throw new Error(data.error);
+                answerText.textContent = data.answer || 'No answer received.';
+                updateProgress('question'); // Update progress on success
+            } catch (err) {
+                answerText.innerHTML = `<span class="text-red-400">❌ Error: ${err.message}</span>`;
+            } finally {
+                setLoading(askBtn, false, '<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg> Ask AI');
+            }
+        });
+
+        // 3. Generate Quiz
+        document.getElementById('quizBtn').addEventListener('click', async () => {
+            const container = document.getElementById('quizContainer');
+            const quizBtn = document.getElementById('quizBtn');
+            const count = document.getElementById('quizCount').value;
+            const topic = document.getElementById('questionInput').value;
+            
+            hideEmptyState();
+            container.classList.remove('hidden');
+            container.innerHTML = '<div class="glass rounded-2xl p-8 text-center glow"><span class="spinner"></span><p class="text-gray-400 mt-3 text-sm">Generating your quiz...</p></div>';
+            setLoading(quizBtn, true, '<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg> Generating...');
+            try {
+                const res = await fetch('/quiz', { 
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ topic, count: parseInt(count) })
+                });
+                const data = await res.json();
+                if (data.error) throw new Error(data.error);
+                if (data.questions) {
+                    container.innerHTML = `<div class="glass rounded-2xl p-5 glow mb-2"><h2 class="text-base font-semibold text-white flex items-center gap-2"><svg class="w-5 h-5 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/></svg> Quiz Results</h2></div>`;
+                    data.questions.forEach((q, i) => {
+                        const div = document.createElement('div');
+                        div.className = 'glass rounded-2xl p-5 fade-in';
+                        div.style.animationDelay = `${i * 0.08}s`;
+                        const opts = q.options.map(opt =>
+                            `<li><label class="flex items-center gap-3 p-2.5 rounded-lg hover:bg-white/5 cursor-pointer transition-colors text-sm">
+                                <input type="radio" name="q${i}" value="${opt}" class="w-4 h-4 accent-indigo-500">
+                                <span class="text-gray-300">${opt}</span>
+                            </label></li>`
+                        ).join('');
+                        div.innerHTML = `
+                            <p class="font-semibold text-white mb-3">${i+1}. ${q.question}</p>
+                            <ul class="space-y-1 mb-3">${opts}</ul>
+                            <button class="text-xs font-medium text-indigo-400 hover:text-indigo-300 transition-colors" onclick="this.nextElementSibling.classList.toggle('hidden')">Show Answer ▾</button>
+                            <p class="hidden text-sm text-emerald-400 font-semibold mt-2 bg-emerald-500/10 border border-emerald-500/20 px-3 py-2 rounded-lg fade-in">✓ ${q.answer}</p>`;
+                        container.appendChild(div);
+                    });
+                    updateProgress('quiz'); // Update progress on success
+                } else { throw new Error('No questions received.'); }
+            } catch (err) { showError(container, err.message); }
+            finally {
+                setLoading(quizBtn, false, '<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg> Generate 5 MCQs');
+            }
+        });
+    </script>
+</body>
+</html>
